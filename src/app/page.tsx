@@ -1,14 +1,15 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { v4 as uuidv4 } from "uuid";
 
 export default function Home() {
   const [uuid, setUuid] = useState("");
   const [copyButtonText, setCopyButtonText] = useState("Copy");
 
-  const generateUuid = useCallback(() => {
-    setUuid(uuidv4());
+  const generateUuid = useCallback(async () => {
+    const response = await fetch("/api/generate");
+    const data = await response.json();
+    setUuid(data.uuid);
   }, []);
 
   const copyUuid = useCallback(() => {
@@ -17,7 +18,7 @@ export default function Home() {
       setCopyButtonText("Copied!");
       setTimeout(() => {
         setCopyButtonText("Copy");
-      }, 2000); // Revert after 2 seconds
+      }, 2000);
     }
   }, [uuid]);
 
