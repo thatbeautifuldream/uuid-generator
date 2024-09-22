@@ -3,48 +3,64 @@
 import { useState, useCallback } from "react";
 
 export default function Home() {
-  const [uuid, setUuid] = useState("");
+  const [uuids, setUuids] = useState<string[]>([]);
+  const [count, setCount] = useState(1);
   const [copyButtonText, setCopyButtonText] = useState("Copy");
 
-  const generateUuid = useCallback(async () => {
-    const response = await fetch("/api/generate");
+  const generateUuids = useCallback(async () => {
+    const response = await fetch(`/api/generate?count=${count}`);
     const data = await response.json();
-    setUuid(data.uuid);
-  }, []);
+    setUuids(data.uuids || [data.uuid]);
+  }, [count]);
 
-  const copyUuid = useCallback(() => {
-    if (uuid) {
-      navigator.clipboard.writeText(uuid);
+  const copyUuids = useCallback(() => {
+    if (uuids.length > 0) {
+      const textToCopy = uuids.join("\n");
+      navigator.clipboard.writeText(textToCopy);
       setCopyButtonText("Copied!");
       setTimeout(() => {
         setCopyButtonText("Copy");
       }, 2000);
     }
-  }, [uuid]);
+  }, [uuids]);
 
   return (
     <div className="p-4">
-      <div className="flex items-center space-x-2">
+      <div className="flex items-center space-x-2 mb-4">
         <input
-          type="text"
-          value={uuid}
-          readOnly
-          placeholder="Generated UUID will appear here"
-          className="flex-grow px-2 py-1 border"
+          type="number"
+          min="1"
+          max="100"
+          value={count}
+          onChange={(e) =>
+            setCount(Math.min(100, Math.max(1, parseInt(e.target.value) || 1)))
+          }
+          className="w-16 px-2 py-1 border rounded"
         />
         <button
-          onClick={generateUuid}
-          className="px-3 py-1 border hover:bg-gray-100"
+          onClick={generateUuids}
+          className="px-3 py-1 border rounded hover:bg-gray-100"
         >
           Generate
         </button>
         <button
-          onClick={copyUuid}
-          className="px-3 py-1 border hover:bg-gray-100"
-          disabled={!uuid}
+          onClick={copyUuids}
+          className="px-3 py-1 border rounded hover:bg-gray-100"
+          disabled={uuids.length === 0}
         >
           {copyButtonText}
         </button>
+      </div>
+      <div className="space-y-2">
+        {uuids.map((uuid, index) => (
+          <input
+            key={index}
+            type="text"
+            value={uuid}
+            readOnly
+            className="w-full px-2 py-1 border rounded"
+          />
+        ))}
       </div>
     </div>
   );
