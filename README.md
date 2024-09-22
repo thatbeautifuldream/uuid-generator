@@ -25,12 +25,6 @@ pnpm dev
 
 4. Open [http://localhost:3000](http://localhost:3000) in your browser to use the app.
 
-## Usage
-
-You're presented with a random UUID on load. Feel free to select and copy the UUID.
-
-To generate a new UUID, simply reload the page.
-
 ## Library Used
 
 - [UUID library](https://www.npmjs.com/package/uuid) - For generating UUIDs
